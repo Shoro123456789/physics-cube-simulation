@@ -25,18 +25,25 @@ square_acceleration = [(square_force[0]/mass), (square_force[1]/mass)]
 square_velocity = [0, 0]
 square_Ek = 0
 metre = 100
+friction_coefficient = 0
+normal_force = 0
 
 paused = False
 debug_hidden = False
 dragging = False
 font = pygame.font.Font(None, 36)
 last_frame_time = pygame.time.get_ticks()
+last_mouse_time = pygame.time.get_ticks()
+last_mouse_pos = pygame.mouse.get_pos()
+mouse_strength = 0.5
 
 while True:
 
     current_frame_time = pygame.time.get_ticks()
     delta_time = (current_frame_time - last_frame_time) / 1000.0  # convert to seconds
     last_frame_time = current_frame_time
+    current_time = pygame.time.get_ticks()
+    current_mouse_pos = pygame.mouse.get_pos()
 
     # Handle events
     for event in pygame.event.get():
@@ -78,8 +85,7 @@ while True:
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             dragging = False
 
-        if dragging:
-            square_velocity = [0, 0]
+
 
 
     if not paused:
@@ -97,7 +103,6 @@ while True:
             square_position[1] = 0
             square_velocity[1] = -0.5 * square_velocity[1]
 
-
         screen.fill((0, 0, 0))
 
         square_Ek= (math.sqrt(square_velocity[0]*square_velocity[0] + square_velocity[1]*square_velocity[1])**2)*0.5*mass
@@ -112,6 +117,13 @@ while True:
     if dragging:
         mouse_x, mouse_y = pygame.mouse.get_pos()
         square_position = [max(0, min(mouse_x, screen_width - square_size)), max(0, min(mouse_y, screen_height - square_size))]
+
+        if current_time - last_mouse_time >= delta_time:
+            mouse_velocity = (current_mouse_pos[0] - last_mouse_pos[0], current_mouse_pos[1] - last_mouse_pos[1])
+            last_mouse_time = current_time
+            last_mouse_pos = current_mouse_pos
+            square_velocity[0] = mouse_velocity[0]
+            square_velocity[1] = mouse_velocity[1]
 
 
     # Draw the square
